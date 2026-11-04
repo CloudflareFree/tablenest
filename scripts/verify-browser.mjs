@@ -197,7 +197,7 @@ try {
     });
     await page("DOM.setFileInputFiles", { nodeId, files: [filename] });
   };
-  await navigate("/");
+  await navigate("/?visit_test=privacy-check");
   await until(
     'document.querySelector("#query-status")?.textContent.includes("查询完成")',
     "SQLite initialized",
@@ -587,18 +587,23 @@ try {
     "navigator.serviceWorker.ready.then(() => new Promise(resolve => setTimeout(resolve, 1500)))",
   );
   check(
-    "Analytics excludes SQL, filenames and results",
+    "Analytics strips navigation parameters and excludes SQL, filenames and results",
     analytics.length > 0 &&
-      analytics.every(
-        (url) =>
+      analytics.every((url) => {
+        const parameters = new URL(url).searchParams;
+        return (
+          parameters.get("dl") === "https://tablenest.137101.xyz/" &&
+          parameters.get("dt") === "表间 TableNest" &&
           ![
             "edge%20cases",
             "O%27Brien",
             "WITH%20RECURSIVE",
             "csv_notes",
             "9223372036854775807",
-          ].some((value) => url.includes(value)),
-      ),
+            "privacy-check",
+          ].some((value) => url.includes(value))
+        );
+      }),
   );
   intentionalOffline = true;
   await page("Network.emulateNetworkConditions", {
