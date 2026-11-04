@@ -1,3 +1,8 @@
+node_modules/
+dist/
 build/
-js/sqlite/sqlite3.js
-js/sqlite/sqlite3.wasm
+.wrangler/
+*.log
+.env*
+.dev.vars*
+*-service-account*.json

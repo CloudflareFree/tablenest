@@ -1,70 +1,405 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <title>Sqlime - SQLite Playground</title>
-
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta property="og:site_name" content="Sqlime" />
-    <meta property="og:title" content="Sqlime - Online SQLite playground" />
-    <meta name="description" content="Sqlime is an online SQLite playground for debugging and sharing SQL snippets.">
-    <meta property="og:description"
-        content="Sqlime is an online SQLite playground for debugging and sharing SQL snippets." />
-    <meta property="og:url" content="https://sqlime.org/" />
-    <meta property="og:image" content="https://sqlime.org/img/cover.png" />
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>表间 TableNest — 浏览器里的 SQLite 数据工作台</title>
+    <meta
+      name="description"
+      content="表间是一款中文 SQLite 在线编辑器。浏览器内运行 SQL，导入数据库与 CSV，探索表结构、查看执行计划、绘制图表并导出数据，无需注册。"
+    />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <link rel="canonical" href="https://tablenest.137101.xyz/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="表间 TableNest" />
+    <meta property="og:title" content="表间 TableNest — 数据的答案，就在这里" />
+    <meta
+      property="og:description"
+      content="一张表，一个问题。中文 SQLite 工作台，在浏览器里探索数据。"
+    />
+    <meta property="og:url" content="https://tablenest.137101.xyz/" />
+    <meta
+      property="og:image"
+      content="https://tablenest.137101.xyz/img/cover.png"
+    />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
-    <meta name="theme-color" content="#181818" media="(prefers-color-scheme: dark)">
-
-    <link rel="icon" href="/img/favicon.ico" sizes="any">
-    <link rel="icon" type="image/svg+xml" href="/img/favicon.svg">
-    <link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
-
-    <link rel="stylesheet" href="css/core.css">
-    <link rel="stylesheet" href="css/layout.css">
-</head>
-
-<body>
-    <div class="grid">
-        <link rel="stylesheet" href="css/header.css">
-        <link rel="stylesheet" href="css/buttons.css">
-        <link rel="stylesheet" href="css/toolbar.css">
-        <header class="header">
-            <h1>
-                <a id="reset" href="./" class="header-logo">
-                    <img src="/img/favicon-64x64.png">
-                </a>
-                <span>SQLite Playground</span> &nbsp;//
-                <db-name id="db-name" class="db-name"></db-name>
-            </h1>
-            <tool-bar id="toolbar" class="toolbar hidden-mobile"></tool-bar>
-        </header>
-
-        <link rel="stylesheet" href="css/editor.css">
-        <link rel="stylesheet" href="css/commandbar.css">
-        <section class="sqlime-editor-section">
-            <sqlime-editor id="editor" class="sqlime-editor"></sqlime-editor>
-            <command-bar id="commandbar" class="sqlime-commandbar sqlime-disabled"></command-bar>
+    <meta name="twitter:title" content="表间 TableNest — 中文 SQLite 工作台" />
+    <meta
+      name="twitter:description"
+      content="本地数据，随手查询。无需后端的 SQLite 编辑器。"
+    />
+    <meta
+      name="twitter:image"
+      content="https://tablenest.137101.xyz/img/cover.png"
+    />
+    <meta name="theme-color" content="#127d6a" />
+    <link rel="icon" href="/img/mark.svg" type="image/svg+xml" />
+    <link
+      rel="preload"
+      href="/fonts/inter-latin.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link rel="stylesheet" href="/css/workbench/app.css?v=1" />
+    <script src="/js/workbench/theme.js?v=1"></script>
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-H4VWQ8WK0L"
+    ></script>
+    <script src="/js/workbench/ga.js?v=1"></script>
+    <script src="/vendor/sql-formatter.js" defer></script>
+    <script src="/js/workbench/app.js?v=1" type="module"></script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "表间 TableNest",
+        "url": "https://tablenest.137101.xyz/",
+        "applicationCategory": "DeveloperApplication",
+        "operatingSystem": "Any",
+        "isAccessibleForFree": true,
+        "inLanguage": "zh-CN",
+        "description": "纯浏览器 SQLite 数据工作台，支持中文 SQL 编辑、CSV 导入、结构探索与数据导出。"
+      }
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#sql-editor">跳到 SQL 编辑器</a>
+    <header class="app-header">
+      <a class="brand" href="/" aria-label="表间首页"
+        ><img src="/img/mark.svg" alt="" width="36" height="36" /><span
+          ><strong>表间<span class="brand-en">TableNest</span></strong
+          ><small>给数据，一个好用的工作台。</small></span
+        ></a
+      >
+      <div class="header-center">
+        <span class="status-dot"></span><span>所有运算，在你的浏览器里</span>
+      </div>
+      <nav class="header-nav" aria-label="工作台操作">
+        <a href="/guide">使用指南 <span aria-hidden="true">↗</span></a
+        ><button
+          class="icon-button"
+          id="theme-toggle"
+          aria-label="切换深浅主题"
+          title="切换主题"
+        >
+          <span data-icon="sun"></span></button
+        ><button
+          id="help-button"
+          class="icon-button"
+          aria-label="查看快捷键"
+          title="快捷键"
+        >
+          <span data-icon="keyboard"></span>
+        </button>
+      </nav>
+    </header>
+    <div class="app-body">
+      <aside class="sidebar" aria-label="数据库浏览器">
+        <div class="sidebar-heading">
+          <span class="eyebrow">DATABASE EXPLORER</span
+          ><button
+            id="sidebar-close"
+            class="icon-button mobile-only"
+            aria-label="关闭数据库导航"
+          >
+            <span data-icon="x"></span>
+          </button>
+        </div>
+        <div class="database-card">
+          <span class="database-symbol" data-icon="database"></span>
+          <div>
+            <strong id="database-name">零售数据.db</strong
+            ><span id="database-meta">正在启动 SQLite…</span>
+          </div>
+          <span class="local-badge">本地</span>
+        </div>
+        <div class="sidebar-actions">
+          <button id="open-file" class="button small">
+            <span data-icon="folder"></span>打开文件</button
+          ><button id="new-database" class="button small">
+            <span data-icon="plus"></span>新建库
+          </button>
+        </div>
+        <input
+          id="database-file"
+          type="file"
+          accept=".db,.sqlite,.sqlite3,.sql,.csv"
+          hidden
+        />
+        <label class="schema-search"
+          ><span data-icon="search"></span
+          ><input
+            id="schema-filter"
+            placeholder="搜索表和视图…"
+            aria-label="搜索表和视图"
+        /></label>
+        <div class="schema-heading">
+          <span>数据结构</span><span id="object-count">—</span>
+        </div>
+        <div id="schema-tree" class="schema-tree" aria-live="polite">
+          <p class="sidebar-empty">正在准备你的数据…</p>
+        </div>
+        <div class="sidebar-lower">
+          <button id="open-history" class="sidebar-link">
+            <span data-icon="history"></span>查询历史<span id="history-count"
+              >0</span
+            ></button
+          ><button id="open-saved" class="sidebar-link">
+            <span data-icon="bookmark"></span>收藏的查询<span id="saved-count"
+              >0</span
+            >
+          </button>
+        </div>
+        <div class="local-note">
+          <span data-icon="shield"></span><strong>数据，只属于你。</strong>
+          <p>数据库、SQL 和查询结果保留在当前浏览器。请定期导出重要数据。</p>
+          <a href="/privacy">了解本地存储</a>
+        </div>
+        <div class="sidebar-footer">
+          <span class="status-dot"></span
+          ><span id="engine-version">SQLite WebAssembly</span>
+        </div>
+      </aside>
+      <div class="mobile-backdrop" hidden></div>
+      <main class="workspace" id="workspace">
+        <div class="workspace-top">
+          <div class="workspace-title">
+            <button
+              id="sidebar-open"
+              class="icon-button mobile-only"
+              aria-label="打开数据库导航"
+            >
+              <span data-icon="menu"></span>
+            </button>
+            <div>
+              <p class="eyebrow">YOUR LOCAL DATA STUDIO</p>
+              <h1>让数据，自己说话<span>。</span></h1>
+            </div>
+          </div>
+          <div class="workspace-actions">
+            <button id="load-demo" class="button">
+              <span data-icon="sparkles"></span><span>示例数据</span></button
+            ><button id="import-csv" class="button">
+              <span data-icon="upload"></span><span>导入 CSV</span>
+            </button>
+            <div class="menu-wrap">
+              <button
+                id="export-database-button"
+                class="button"
+                aria-expanded="false"
+                aria-controls="database-export-menu"
+              >
+                <span data-icon="download"></span><span>导出数据库</span
+                ><span data-icon="chevron"></span>
+              </button>
+              <div id="database-export-menu" class="menu" hidden>
+                <button id="export-database">SQLite 文件 (.db)</button
+                ><button id="export-dump">SQL 脚本 (.sql)</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <section class="editor-panel panel" aria-label="SQL 编辑区">
+          <div class="editor-tabs-row">
+            <div
+              id="query-tabs"
+              class="query-tabs"
+              role="tablist"
+              aria-label="查询标签"
+            ></div>
+            <button
+              id="add-tab"
+              class="icon-button"
+              aria-label="新建查询标签"
+              title="新建查询"
+            >
+              <span data-icon="plus"></span>
+            </button>
+            <div class="editor-language">
+              SQL <span class="tiny-dot"></span> SQLite
+            </div>
+          </div>
+          <div class="editor-container" id="editor-container">
+            <div id="line-numbers" class="line-numbers" aria-hidden="true">
+              1
+            </div>
+            <div class="editor-code">
+              <pre id="sql-highlight" aria-hidden="true"><code></code></pre>
+              <textarea
+                id="sql-editor"
+                aria-label="SQL 编辑器"
+                spellcheck="false"
+                autocapitalize="off"
+                autocomplete="off"
+                wrap="off"
+                placeholder="写一条 SQL，从这里开始…"
+                disabled
+              ></textarea>
+            </div>
+          </div>
+          <div class="editor-toolbar">
+            <div class="run-actions">
+              <button id="run-query" class="button primary" disabled>
+                <span data-icon="play"></span><span>运行查询</span
+                ><kbd>⌘ ↵</kbd></button
+              ><button id="cancel-query" class="button danger" hidden>
+                <span data-icon="stop"></span>停止</button
+              ><span class="selection-hint" id="selection-hint"
+                >选中一段，可单独运行</span
+              >
+            </div>
+            <div class="editor-tools">
+              <button id="format-query" class="text-button" title="格式化 SQL">
+                <span data-icon="align"></span><span>格式化</span></button
+              ><button
+                id="explain-query"
+                class="text-button"
+                title="EXPLAIN QUERY PLAN"
+              >
+                <span data-icon="route"></span><span>执行计划</span></button
+              ><button
+                id="save-query"
+                class="icon-button"
+                aria-label="收藏当前查询"
+                title="收藏查询"
+              >
+                <span data-icon="bookmark"></span></button
+              ><button
+                id="download-query"
+                class="icon-button"
+                aria-label="下载 SQL 查询"
+                title="下载 SQL"
+              >
+                <span data-icon="download"></span>
+              </button>
+            </div>
+          </div>
         </section>
-
-        <link rel="stylesheet" href="css/result.css">
-        <link rel="stylesheet" href="css/status.css">
-        <section class="sqlime-result-section">
-            <sqlime-status id="status" class="sqlime-status"></sqlime-status>
-            <sqlime-result id="result" class="sqlime-result"></sqlime-result>
+        <div class="example-strip">
+          <span><span data-icon="sparkles"></span>试试这些灵感</span>
+          <div id="example-buttons"></div>
+        </div>
+        <section class="results-panel panel" aria-label="查询结果">
+          <div class="results-heading">
+            <div class="view-tabs" role="tablist" aria-label="结果视图">
+              <button id="view-table" role="tab" aria-selected="true">
+                <span data-icon="table"></span>查询结果<span id="result-count"
+                  >0</span
+                ></button
+              ><button id="view-chart" role="tab" aria-selected="false">
+                <span data-icon="chart"></span>图表
+              </button>
+            </div>
+            <div class="result-actions">
+              <label class="result-search"
+                ><span data-icon="search"></span
+                ><input
+                  id="result-filter"
+                  aria-label="筛选当前查询结果"
+                  placeholder="筛选结果…"
+              /></label>
+              <div class="menu-wrap">
+                <button
+                  id="export-results-button"
+                  class="icon-button"
+                  aria-label="导出查询结果"
+                  title="导出结果"
+                  aria-expanded="false"
+                  aria-controls="results-export-menu"
+                >
+                  <span data-icon="download"></span>
+                </button>
+                <div id="results-export-menu" class="menu" hidden>
+                  <button data-export="csv">导出 CSV</button
+                  ><button data-export="json">导出 JSON</button
+                  ><button data-export="sql">导出 INSERT SQL</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            class="query-status"
+            id="query-status"
+            role="status"
+            aria-live="polite"
+          >
+            <span class="status-dot"></span><span>正在准备工作台…</span>
+          </div>
+          <div id="result-table" class="result-table">
+            <div class="result-empty">
+              <span data-icon="table"></span
+              ><strong>数据的答案，就在这里。</strong>
+              <p>运行查询，即可看到结果。</p>
+            </div>
+          </div>
+          <div id="result-chart" class="result-chart" hidden></div>
+          <div class="result-footer">
+            <span id="result-summary">0 条记录</span>
+            <div class="pagination">
+              <label
+                >每页
+                <select id="page-size" aria-label="每页行数">
+                  <option value="50">50</option>
+                  <option value="100">100</option>
+                  <option value="200">200</option>
+                </select></label
+              ><button
+                id="previous-page"
+                class="icon-button"
+                aria-label="上一页"
+              >
+                <span data-icon="left"></span></button
+              ><span id="page-number">1 / 1</span
+              ><button id="next-page" class="icon-button" aria-label="下一页">
+                <span data-icon="right"></span>
+              </button>
+            </div>
+          </div>
         </section>
+        <footer class="workspace-footer">
+          <span
+            ><span data-icon="shield"></span>SQLite 引擎 · 浏览器内运行 ·
+            自动保存到本机</span
+          ><span
+            >表间 TableNest
+            <span class="footer-dot">·</span> 为每一个好问题而造</span
+          >
+        </footer>
+      </main>
     </div>
-
-    <script src="./js/sqlite/sqlite3.js"></script>
-    <script type="module" src="js/components/copy-link.js"></script>
-    <script type="module" src="js/components/db-name.js"></script>
-    <script type="module" src="js/components/toolbar.js"></script>
-    <script type="module" src="js/components/command-bar.js"></script>
-    <script type="module" src="js/components/sqlime-editor.js"></script>
-    <script type="module" src="js/components/sqlime-result.js"></script>
-    <script type="module" src="js/components/sqlime-status.js"></script>
-    <script type="module" src="js/index.js"></script>
-</body>
-
+    <dialog id="app-dialog" aria-labelledby="dialog-title">
+      <form id="dialog-form">
+        <div class="dialog-heading">
+          <div>
+            <span class="eyebrow">TABLENEST WORKSPACE</span>
+            <h2 id="dialog-title"></h2>
+          </div>
+          <button
+            type="button"
+            id="dialog-close"
+            class="icon-button"
+            aria-label="关闭弹窗"
+          >
+            <span data-icon="x"></span>
+          </button>
+        </div>
+        <div id="dialog-body"></div>
+        <div id="dialog-actions" class="dialog-actions"></div>
+      </form>
+    </dialog>
+    <div id="toast" class="toast" role="status" hidden></div>
+    <noscript
+      ><div class="noscript">
+        <h2>在浏览器里探索 SQLite 数据</h2>
+        <p>
+          表间支持数据库导入、SQL 查询、CSV
+          导入、执行计划、查询历史、数据图表与导出。请启用 JavaScript
+          使用工作台。数据库与查询不上传服务器。
+        </p>
+        <a href="/guide">阅读使用指南</a>
+      </div></noscript
+    >
+  </body>
 </html>

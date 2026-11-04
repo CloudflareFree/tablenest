@@ -1,39 +1,13 @@
-# Sqlime
+# 表间 TableNest
 
-**[Sqlime](http://sqlime.org/)** is an online SQLite playground for debugging and sharing SQL snippets. Kinda like JSFiddle, but for SQL instead of JavaScript.
+中文浏览器 SQLite 数据工作台。数据库、CSV、SQL 和查询结果在本机处理，无应用后端。
 
-Here are some notable features:
+- 在线使用：https://tablenest.137101.xyz
+- SQLite 3.54.1 WebAssembly，独立 Worker 执行，长查询可停止。
+- 数据库及 SQL 文件导入、CSV 预览与事务导入、结构浏览、多标签查询、格式化、执行计划。
+- 筛选、排序、分页、柱状图，导出 SQLite 文件、SQL 脚本、CSV、JSON、INSERT SQL。
+- 查询历史、收藏与本机自动保存，明暗主题、响应式布局与快捷键。
 
-**🔋 Full-blown database in the browser**
+使用 Node 24：`npm run build` 生成 `dist`；`npm test` 检查数据转换；`npm run verify:browser -- <URL>` 运行真实浏览器验收。完整部署、限制与备份说明见 [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)。
 
-Sqlime is backed by the latest version of SQLite, compiled to WebAssembly. It provides a full-featured SQL implementation, including indexes, triggers, views, transactions, CTEs, window functions and execution plans.
-
-**🔌 Connect any data source**
-
-Connect any local or remote SQLite database. Both files and URLs are supported. For example, try loading the [Employees database](http://sqlime.org/#https://raw.githubusercontent.com/nalgeon/sqliter/main/employees.en.db) from the GitHub repo.
-
-**🔗 Save and share with others**
-
-Sqlime saves both the database and the queries to GitHub so that you can revisit them later or share them with a colleague. The database is stored as a plain text SQL dump, so it's easy to read the code or import data into PostgreSQL, MySQL, or other databases.
-
-For example, here is the [gist](https://gist.github.com/nalgeon/e012594111ce51f91590c4737e41a046) for the Employees database, and here is the [sharing link](https://sqlime.org/#gist:e012594111ce51f91590c4737e41a046) for it.
-
-**📱 Mobile friendly**
-
-Most playgrounds are not meant for small screens. Sqlime was specifically designed and tested on mobile devices. No need to zoom or aim at tiny buttons — everything looks and works just fine.
-
-**🔒 Secure and private**
-
-There is no server. Sqlime works completely in the browser. GitHub credentials are also stored locally. Queries are saved as private GitHub gists within your account. Your data is yours only.
-
-**⌨️ Dead simple**
-
-Sqlime has zero third-party dependencies other than SQLite. Good old HTML, CSS, and vanilla JS — that's all. No frameworks, no heavy editors, no obsolete and vulnerable libraries. Just some modular open-source code, which is easy to grasp and extend.
-
-## Contributing
-
-This project only accepts bug fixes.
-
-## License
-
-Created by [Anton Zhiyanov](https://antonz.org/). Released under the MIT License.
+保留第三方软件的版权与许可，见 [LICENSE](LICENSE)、字体许可和格式化器许可。SQLite 官方运行时为本地静态文件，不从第三方 CDN 加载。

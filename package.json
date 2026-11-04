@@ -1,0 +1,16 @@
+{
+  "name":"tablenest",
+  "version":"1.0.0",
+  "private":true,
+  "type":"module",
+  "engines":{"node":">=24"},
+  "scripts":{
+    "build":"node scripts/build.mjs",
+    "dev":"python3 -m http.server 8895 --bind 127.0.0.1",
+    "test":"node --test test/workbench.test.mjs",
+    "verify:browser":"node scripts/verify-browser.mjs",
+    "seo:submit":"node scripts/search-console.mjs submit",
+    "seo:status":"node scripts/search-console.mjs status",
+    "seo:inspect":"node scripts/search-console.mjs inspect"
+  }
+}

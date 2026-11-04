@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://tablenest.137101.xyz/sitemap.xml
