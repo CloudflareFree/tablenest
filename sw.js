@@ -1,4 +1,4 @@
-const CACHE = "tablenest-core-v1";
+const CACHE = "tablenest-core-v2";
 const FILES = [
   "/",
   "/css/workbench/app.css?v=1",
